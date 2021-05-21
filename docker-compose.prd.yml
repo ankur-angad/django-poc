@@ -1,0 +1,35 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: web
+    restart: always
+    env_file:
+      - local.env
+    command: >
+        sh -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - 80:8000
+
+  nginx:
+    build:
+      context: ./docker/nginx/Production
+      dockerfile: Dockerfile
+    container_name: nginx
+    volumes:
+      - ./djangoLoginUsers/static:/code/djangoLoginUsers/static
+      - socket_volume:/tmp/inspire-socks
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    depends_on:
+      - web
+  volumes:
+    postgres_volume:
+    static_volume:
+    socket_volume:
